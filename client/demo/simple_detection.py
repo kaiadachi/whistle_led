@@ -1,12 +1,14 @@
 # for detection
+import sys,os
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/..')
+# import pprint
+# pprint.pprint(sys.path)
 
 import datetime
-import os
-import sys
 import numpy as np
 import pyaudio
 
-import model as model
+from common import model_3class, util
 
 if len(sys.argv) == 2:
     RECORD_SECONDS = int(sys.argv[1])
@@ -14,17 +16,17 @@ else:
     RECORD_SECONDS = 30
 
 
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
-RATE = 16000
+FORMAT = util.FORMAT
+CHANNELS = util.CHANNELS
+RATE = util.RATE
 CHUNK = int(RATE/10)
-project_dir = os.getcwd() + "/"
-
-FILE_MODEL = "./model/model_4.ckpt"
+FILE_MODEL = "./model/model_3class.ckpt"
 DATA_LEN = RATE
+
 print("=> init model")
-model = model.Model((DATA_LEN))
+model = model_3class.Model((DATA_LEN, util.OUTPUT_SIZE))
 model.load_model(FILE_MODEL)
+
 
 def main():
     audio = pyaudio.PyAudio()
@@ -69,9 +71,9 @@ def main():
             spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
             spectrum = np.array(spectrum, dtype=np.float32)
             input_data = spectrum[np.newaxis, :]
-            output = model.get_sigout(input_data)
-
-            print("output:", output[0][0])
+            output = model.get_softmax(input_data)
+            max_index = np.argmax(output)
+            print("output, class:", output, util.Status(max_index))
 
     stream.close()
     audio.terminate()

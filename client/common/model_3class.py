@@ -68,6 +68,9 @@ class Model:
             feed_dict={self.x:inp, self.labels:label})
         return pred
     
+    def get_maxindex(self,inp):
+        return tf.argmax( self.get_softmax(inp),1)
+
     def update_model(self, inp, label):
         self.sess.run( self.train_step, feed_dict={self.x:inp, self.labels:label})
 
