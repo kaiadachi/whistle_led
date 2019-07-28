@@ -26,4 +26,4 @@ tensorflow==1.14.0
 termcolor==1.1.0
 Wave==0.0.2
 Werkzeug==0.14.1
-
+librosa==0.7.0

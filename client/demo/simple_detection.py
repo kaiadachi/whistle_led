@@ -7,7 +7,8 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/..')
 import datetime
 import numpy as np
 import pyaudio
-
+import queue
+import librosa
 from common import model_3class, util
 
 if len(sys.argv) == 2:
@@ -24,7 +25,7 @@ FILE_MODEL = "./model/model_3class.ckpt"
 DATA_LEN = RATE
 
 print("=> init model")
-model = model_3class.Model((DATA_LEN, util.OUTPUT_SIZE))
+model = model_3class.Model((2048, util.OUTPUT_SIZE))
 model.load_model(FILE_MODEL)
 
 
@@ -68,10 +69,18 @@ def main(queue):
             for f in frm:
                 d = np.frombuffer(f, dtype="int16") / 32768.0
                 frames = np.append(frames, d)
-            fft = np.fft.fft(frames)
-            spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
-            spectrum = np.array(spectrum, dtype=np.float32)
-            input_data = spectrum[np.newaxis, :]
+
+
+            S = librosa.feature.melspectrogram(y=frames, sr=util.RATE, n_mels=128, hop_length=1024)
+            log_S = librosa.power_to_db(S)
+            ret = (log_S.reshape(-1) - util.MEDIAN) / util.MEL_DIV
+            input_data = ret[np.newaxis, :]
+
+            # fft = np.fft.fft(frames)
+            # spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
+            # spectrum = np.array(spectrum, dtype=np.float32)
+            # input_data = spectrum[np.newaxis, :]
+            
             output = model.get_softmax(input_data)
             max_index = np.argmax(output)
             print("output, class:", output, util.Status(max_index))
@@ -85,4 +94,4 @@ def main(queue):
         queue.put("Error")
 
 if __name__ == "__main__":
-    main()
+    main(queue.Queue)
