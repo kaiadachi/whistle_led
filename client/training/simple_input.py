@@ -16,7 +16,7 @@ def main():
     CHANNELS = 1
     RATE = 16000
     CHUNK = int(RATE/10)
-    project_dir = os.getcwd() + "/"
+    project_dir = os.getcwd() + "/training"
 
     audio = pyaudio.PyAudio()
 
@@ -57,8 +57,6 @@ def main():
         print("保存できませんでした")
         return
 
-    # if not os.path.exists(project_dir + 'sounds'):
-    #     os.mkdir(project_dir + "sounds")
     if not os.path.exists(project_dir + 'on_data') and isOn == "1":
         os.mkdir(project_dir + 'on_data')
     if not os.path.exists(project_dir + 'off_data') and isOn == "2":
