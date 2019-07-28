@@ -18,8 +18,8 @@ project_dir = os.getcwd() + "/training/"
 
 audio = pyaudio.PyAudio()
 
-if not os.path.exists(project_dir + "noise_data"):
-    os.mkdir(project_dir + "noise_data")
+if not os.path.exists(project_dir + "none_data"):
+    os.mkdir(project_dir + "none_data")
 
 frame_dict = {}
 for t in range(RECORD_SECONDS):
@@ -34,7 +34,7 @@ for t in range(RECORD_SECONDS):
     stream.close()
     stream.stop_stream()
     now = datetime.datetime.now()
-    file_name = project_dir + "noise_data/" + "noise_{0:%Y%m%d%H%M%S.%s}.wav".format(now)
+    file_name = project_dir + "none_data/" + "none_{0:%Y%m%d%H%M%S.%s}.wav".format(now)
     frame_dict[file_name] = frames
     # print(file_name)
     print("end")

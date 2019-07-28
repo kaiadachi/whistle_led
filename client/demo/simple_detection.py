@@ -38,8 +38,9 @@ def main(queue):
     frame = []
     all_whistle = []
     tmp = [False for k in range(20)]
-    start = int((CHUNK / 2 / 8) * 0.5)
-    end = int((CHUNK / 2 / 8) * 4)
+    start = util.start
+    end = util.end
+    # is_detected = False
     print("口笛の検出をします。検出時間は" + str(RECORD_SECONDS) + "秒間です")
     for i in range(int(RATE / CHUNK * RECORD_SECONDS)):
         data = stream.read(CHUNK)
@@ -47,8 +48,8 @@ def main(queue):
         np_data = np.frombuffer(data, dtype="int16") / 32768.0
         fft = np.fft.fft(np_data)
         amplitude_spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
-        threshold1 = 0.2  # CAN BE CHANGED
-        threshold2 = 0.1  # CAN BE CHANGED
+        threshold1 = util.Threshold.threshold1   # CAN BE CHANGED
+        threshold2 = util.Threshold.threshold2  # CAN BE CHANGED
         is_threshold_over = False
         sound_range = amplitude_spectrum[start:end]
 
@@ -88,7 +89,7 @@ def main(queue):
 
             output = model.get_softmax(input_data)
             max_index = np.argmax(output)
-            # print("output, class:", output, util.Status(max_index))
+            print("output, class:", output, util.Status(max_index))
             # print(util.Status(max_index))
             print("send" + str(max_index))
             queue.put(str(max_index))
