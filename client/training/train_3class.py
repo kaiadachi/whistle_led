@@ -40,25 +40,16 @@ def read_data(data, fname, label):
         data.append( util.Data(spectrum, label) )
 
 def create_train_test():
-    data_red, data_on, data_off = [], [], []
-    print(" Read RED dir")
-    read_data(data_red, util.RED_DIR+"*.wav", util.Status.RED)
-    print(" Read ON dir")
-    read_data(data_on, util.ON_DIR+"*.wav", util.Status.ON)
-    print(" Read OFF dir")
-    read_data(data_off, util.OFF_DIR+"*.wav", util.Status.OFF)
-
-    num_red_train = int(util.PER_TRAIN * len(data_red))
-    num_on_train = int(util.PER_TRAIN * len(data_on))
-    num_off_train = int(util.PER_TRAIN * len(data_off))
-
-    data_train = np.concatenate( [data_red[:num_red_train], data_on[:num_on_train], data_off[:num_off_train]] )
-    data_test = np.concatenate( [data_red[num_red_train:], data_on[num_on_train:], data_off[num_off_train:]] )
-    print( "RED  train:{}, test:{}".format(num_red_train, len(data_red)-num_red_train) )
-    print( "ON   train:{}, test:{}".format(num_on_train, len(data_on)-num_on_train) )
-    print( "OFF  train:{}, test:{}".format(num_off_train, len(data_off)-num_off_train) )
+    data_train = np.array([])
+    data_test = np.array([])
+    for status in util.Status:
+        d = []
+        read_data(d, util.get_dir(status) + "*.wav", status)
+        num_train = int(util.PER_TRAIN * len(d))
+        data_train = np.append(data_train, d[:num_train])
+        data_test = np.append(data_test, d[num_train:])
+        print("  Read", status, " train:{}, test:{}".format(num_train, len(d)-num_train))
     print("Total Train:{}, Test:{}".format(len(data_train), len(data_test)))
-
     return data_train, data_test
     
 

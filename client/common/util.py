@@ -5,6 +5,7 @@ class Status(Enum):
     RED = 0
     ON = 1
     OFF = 2
+    NONE = 3
 
 class Data:
     def __init__(self, s, l):
@@ -14,11 +15,22 @@ class Data:
 RED_DIR = "./training/red_data/"
 ON_DIR = "./training/on_data/"
 OFF_DIR = "./training/off_data/"
+NONE_DIR = "./training/none_data/"
+
+def get_dir(status):
+    if status==Status.RED:
+        return RED_DIR
+    elif status==Status.ON:
+        return ON_DIR
+    elif status==Status.OFF:
+        return OFF_DIR
+    else:
+        return NONE_DIR
 
 PER_TRAIN = 0.9
 CHUNK, RATE = 1024, 16000
 DATA_LEN = RATE
-OUTPUT_SIZE = 3
+OUTPUT_SIZE = len(Status)
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 
