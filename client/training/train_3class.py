@@ -13,7 +13,7 @@ from common import model_3class, util
 
 rets = np.array([])
 
-NUM_EPOCH , NUM_BATCH = 5, 32
+NUM_EPOCH , NUM_BATCH = 7, 32
 
 def wave_fft(file_name):
     global rets
@@ -23,7 +23,7 @@ def wave_fft(file_name):
     buf_int = np.frombuffer(buf, dtype="int16") / 32768.0
 
     # only fft
-    # buf_fft = np.fft.fft(buf_int) 
+    # buf_fft = np.fft.fft(buf_int)
     # ret = [ np.sqrt(c.real ** 2 + c.imag ** 2)/util.MAX for c in buf_fft]
 
     # mel
@@ -51,7 +51,7 @@ def create_train_test():
         print("  Read", status, " train:{}, test:{}".format(num_train, len(d)-num_train))
     print("Total Train:{}, Test:{}".format(len(data_train), len(data_test)))
     return data_train, data_test
-    
+
 
 def calc_acc(data):
     total_pred = np.array([])
@@ -61,7 +61,7 @@ def calc_acc(data):
         batch_input = np.array([i.spectrum for i in batch], dtype=np.float32)
         batch_label = np.array([i.label.value for i in batch], dtype=np.float32)
         pred = model.get_pred(batch_input, batch_label)
-        total_pred = np.concatenate([total_pred, pred])            
+        total_pred = np.concatenate([total_pred, pred])
     return np.mean(total_pred)
 
 if __name__=='__main__':
@@ -96,6 +96,3 @@ if __name__=='__main__':
 
         np.random.shuffle(data_train)
         model.save_model("./model/model_3class.ckpt")
-        
-
-
