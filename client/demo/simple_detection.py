@@ -28,7 +28,7 @@ model = model_3class.Model((DATA_LEN, util.OUTPUT_SIZE))
 model.load_model(FILE_MODEL)
 
 
-def main():
+def main(queue):
     audio = pyaudio.PyAudio()
     stream = audio.open(format=FORMAT, channels=CHANNELS,
                         rate=RATE, input=True,
@@ -37,6 +37,7 @@ def main():
     frame = []
     all_whistle = []
     tmp = [False for k in range(20)]
+    is_detected = False
     print("口笛の検出をします。検出時間は" + str(RECORD_SECONDS) + "秒間です")
     for i in range(int(RATE / CHUNK * RECORD_SECONDS)):
         data = stream.read(CHUNK)
@@ -74,10 +75,14 @@ def main():
             output = model.get_softmax(input_data)
             max_index = np.argmax(output)
             print("output, class:", output, util.Status(max_index))
+            queue.put(util.Status(max_index))
+            is_detected = True
 
     stream.close()
     audio.terminate()
     print("検出終了")
+    if(not is_detected):
+        queue.put("Error")
 
 if __name__ == "__main__":
     main()
