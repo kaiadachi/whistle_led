@@ -14,7 +14,7 @@ from common import model_3class, util
 if len(sys.argv) == 2:
     RECORD_SECONDS = int(sys.argv[1])
 else:
-    RECORD_SECONDS = 30
+    RECORD_SECONDS = 90
 
 
 FORMAT = util.FORMAT
