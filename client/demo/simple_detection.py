@@ -89,7 +89,7 @@ def main(queue):
 
             output = model.get_softmax(input_data)
             max_index = np.argmax(output)
-            # print("output, class:", output, util.Status(max_index))
+            print("output, class:", output, util.Status(max_index))
             # print(util.Status(max_index))
             print("send" + str(max_index))
             queue.put(str(max_index))
