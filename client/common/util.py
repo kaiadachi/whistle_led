@@ -7,6 +7,10 @@ class Status(Enum):
     OFF = 2
     NONE = 3
 
+class Threshold:
+    threshold1 = 0.15
+    threshold2 = 0.05
+
 class Data:
     def __init__(self, s, l):
         self.spectrum = s
@@ -41,3 +45,7 @@ MAX =  178.20020581988499 / 2.0
 # for mel
 MEDIAN =  -35.069356381907625
 MEL_DIV = 18
+
+# for detection
+start = int((CHUNK / 2 / 8) * 0.5)
+end = int((CHUNK / 2 / 8) * 4)
