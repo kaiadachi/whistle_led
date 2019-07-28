@@ -4,7 +4,7 @@ import sys
 import wave
 import pyaudio
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 if len(sys.argv) == 2:
     RECORD_NUMBER = int(sys.argv[1])
@@ -19,14 +19,18 @@ RATE = 16000
 CHUNK = int(RATE/10)
 project_dir = os.getcwd() + "/training/"
 
+
 def main():
-
-
     frames = []
     all_whistle = {}
     tmp = [False for k in range(20)]
     audio = pyaudio.PyAudio()
     is_data_exist = [False for k in range(3)]
+
+    start = int((CHUNK / 2 / 8) * 0.5)
+    end = int((CHUNK / 2 / 8) * 4)
+    axis_x = np.fft.fftfreq(CHUNK, d=1.0 / RATE)
+    print(axis_x[start], axis_x[end])
 
     print("口笛の検出をします。検出回数は" + str(RECORD_NUMBER) + "、各検出の秒数は" + str(RECORD_SECONDS) + "です")
     for n in range(RECORD_NUMBER):
@@ -37,24 +41,23 @@ def main():
                             frames_per_buffer=CHUNK)
 
         for i in range(int(RATE / CHUNK * RECORD_SECONDS)):
-
             data = stream.read(CHUNK)
             # convert data
             np_data = np.frombuffer(data, dtype="int16") / 32768.0
             # print("mean: ", np.mean(np_data))
             # print("max:  ", np.max(np_data))
-            # fft = np.fft.fft(np_data)
+            fft = np.fft.fft(np_data)
             # axis_x = np.fft.fftfreq(len(fft), d=1.0 / RATE)
             # print(fft.shape, axis_x.shape)
-            # amplitude_spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
-            # spectrum = np.array(spectrum, dtype=np.float32)
-            # np.max(fft)
-            threshold = 0.2  # CAN BE CHANGED
+            amplitude_spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
+
+            threshold1 = 0.2  # CAN BE CHANGED
+            threshold2 = 0.1  # CAN BE CHANGED
             is_threshold_over = False
-            if max(np_data) > threshold:
+            sound_range = amplitude_spectrum[start:end]
+
+            if max(np_data) > threshold1 and np.mean(sound_range) > threshold2:
                 is_threshold_over = True
-                # print(True)
-                # print("max spectrum ", np.max(fft))
 
             tmp.append(is_threshold_over)
             tmp.pop(0)  # remove the oldest element
@@ -65,13 +68,10 @@ def main():
 
             # whistle detection
             # CAN BE IMPROVED!!
-            if 2 <= sum(tmp[8:12]) <= 4 and i >= 16:
+            if 2 <= sum(tmp[8:12]) < 4 and i >= 16:
                 print("口笛らしき音声検出！！")
-                # print(axis_x[0], axis_x[-1])
-                # plt.plot(axis_x, fft)
-                # plt.plot(axis_x[800:], fft[800:])
-                plt.show()
-                # plt.plot(axis_x, amplitude_spectrum)
+                # plt.plot(axis_x[start:end], amplitude_spectrum[start:end])
+                # plt.axhline(y=np.mean(sound_range), color='r')
                 # plt.show()
                 frame = frames[5:15]
                 tmp = [False for k in range(0, 20)]
@@ -119,6 +119,7 @@ def main():
         wave_file.setframerate(RATE)
         wave_file.writeframes(b''.join(v))
         wave_file.close()
+
 
 if __name__ == "__main__":
     main()
