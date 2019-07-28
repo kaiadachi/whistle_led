@@ -70,7 +70,7 @@ def main():
 
             # whistle detection
             # CAN BE IMPROVED!!
-            if 2 <= sum(tmp[7:13]) <= 4 and i >= 16:
+            if 1 <= sum(tmp[7:13]) <= 4 and i >= 16:
                 print("口笛らしき音声検出！！")
                 # plt.plot(axis_x[start:end], amplitude_spectrum[start:end])
                 # plt.axhline(y=np.mean(sound_range), color='r')

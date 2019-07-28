@@ -65,7 +65,7 @@ def main(queue):
 
         # whistle detection
         # CAN BE IMPROVED!!
-        if 2 <= sum(tmp[7:13]) <= 4 and i >= 16:
+        if 1 <= sum(tmp[7:13]) <= 4 and i >= 16:
             print("口笛検出")
             all_whistle.append(frame[5:15])
             tmp = [False for k in range(0, 20)]
