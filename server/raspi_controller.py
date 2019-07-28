@@ -28,9 +28,29 @@ def setup():
 		GPIO.setup(green, GPIO.OUT)
 		GPIO.setup(blue, GPIO.OUT)
 
+def connectChange(color):
+	if color == 0:
+		connectRed()
+	elif color == 1:
+		connectGreen()
+	elif color == 2:
+		connectBlue()
+	else:
+		connectAll()
+
 def connectRed():
 	for (red, green, blue) in zip(reds, greens, blues):
 		ledOn = convertDict([red, False], [green, True], [blue, True])
+		switchLed(**ledOn)
+
+def connectGreen():
+	for (red, green, blue) in zip(reds, greens, blues):
+		ledOn = convertDict([red, True], [green, False], [blue, True])
+		switchLed(**ledOn)
+
+def connectBlue():
+	for (red, green, blue) in zip(reds, greens, blues):
+		ledOn = convertDict([red, True], [green, True], [blue, False])
 		switchLed(**ledOn)
 
 def connectAll():

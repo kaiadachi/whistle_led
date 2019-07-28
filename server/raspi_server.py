@@ -14,6 +14,7 @@ def recieveSocket(host='172.20.10.5', port=5000):
         c, addr = s.accept()
 
         flg = True
+        color = 0
         while flg:
             print 'receiving'
             recieve = c.recv(4096).decode()
@@ -23,7 +24,8 @@ def recieveSocket(host='172.20.10.5', port=5000):
             c.send("from server: " + recieve)
 
             if(recieve == '0'):
-                connectRed()
+                connectChange(color % 4)
+                color += 1
             elif(recieve == '1'):
                 connectAll()
             elif(recieve == '2'):
