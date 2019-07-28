@@ -36,8 +36,8 @@ def main():
                         frames_per_buffer=CHUNK)
 
     frame = []
-    all_whistle = []
     tmp = [False for k in range(20)]
+    is_detected = False
     print("口笛の検出をします。検出時間は" + str(RECORD_SECONDS) + "秒間です")
     for i in range(int(RATE / CHUNK * RECORD_SECONDS)):
         data = stream.read(CHUNK)
@@ -58,11 +58,8 @@ def main():
 
         # whistle detection
         # CAN BE IMPROVED!!
-        if 1 <= sum(tmp[7:13]) <= 4 and i >= 16:
+        if sum(tmp[7:13]) >= 3 and i >= 16:
             print("口笛検出")
-            all_whistle.append(frame[5:15])
-            tmp = [False for k in range(0, 20)]
-
             frm = frame[5:15]
             frames = np.array([])
             for f in frm:
@@ -83,6 +80,8 @@ def main():
             output = model.get_softmax(input_data)
             max_index = np.argmax(output)
             print("output, class:", output, util.Status(max_index))
+            tmp = [False for k in range(20)]
+
 
     stream.close()
     audio.terminate()

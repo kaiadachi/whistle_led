@@ -38,9 +38,9 @@ class Model:
         self.sess.run(tf.compat.v1.global_variables_initializer())
 
     def init_model(self):
-        num_fc1 = 256
-        num_fc2 = 256
-        num_fc3 = 256
+        num_fc1 = 128
+        num_fc2 = 128
+        num_fc3 = 128
         
         w_fc1 = weight_variable( [self.input_size, num_fc1] )
         b_fc1 = bias_variable([num_fc1])
