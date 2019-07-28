@@ -2,6 +2,7 @@ import socket
 from contextlib import closing
 import sys
 import queue
+import traceback
 
 def doSocket(queue):
     s = socket.socket()
@@ -14,14 +15,23 @@ def doSocket(queue):
     try:
         while True:
             status = queue.get()
-            print(status)
-            if (status != "Error"):
+            print("catch" + status)
+            if (status != "fin"):
                 s.send(status.encode())
+            else:
+                s.send(status.encode())
+                break
 
-            print (host, s.recv(4096))
+            print (s.recv(4096))
+
     except KeyboardInterrupt:
+        traceback.print_exc()
+        print("except!!")
         print("close socket")
         s.close()
+
+    print("close socket")
+    s.close()
 
 if __name__ == '__main__':
     doSocket(queue.Queue())

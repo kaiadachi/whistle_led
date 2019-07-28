@@ -40,7 +40,6 @@ def main(queue):
     tmp = [False for k in range(20)]
     start = int((CHUNK / 2 / 8) * 0.5)
     end = int((CHUNK / 2 / 8) * 4)
-    is_detected = False
     print("口笛の検出をします。検出時間は" + str(RECORD_SECONDS) + "秒間です")
     for i in range(int(RATE / CHUNK * RECORD_SECONDS)):
         data = stream.read(CHUNK)
@@ -86,18 +85,19 @@ def main(queue):
             # spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
             # spectrum = np.array(spectrum, dtype=np.float32)
             # input_data = spectrum[np.newaxis, :]
-            
+
             output = model.get_softmax(input_data)
             max_index = np.argmax(output)
-            print("output, class:", output, util.Status(max_index))
-            queue.put(util.Status(max_index))
-            is_detected = True
+            # print("output, class:", output, util.Status(max_index))
+            # print(util.Status(max_index))
+            print("send" + str(max_index))
+            queue.put(str(max_index))
+
 
     stream.close()
     audio.terminate()
     print("検出終了")
-    if(not is_detected):
-        queue.put("Error")
+    queue.put("fin")
 
 if __name__ == "__main__":
-    main(queue.Queue)
+    main(queue.Queue())

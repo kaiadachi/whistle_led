@@ -13,7 +13,7 @@ from common import model_3class, util
 
 rets = np.array([])
 
-NUM_EPOCH , NUM_BATCH = 10, 32
+NUM_EPOCH , NUM_BATCH = 5, 32
 
 def wave_fft(file_name):
     global rets
