@@ -23,7 +23,7 @@ def wave_fft(file_name):
     # axis_x = np.fft.fftfreq(len(buf_fft), d=1.0/RATE)
     # plt.plot(axis_x, buf_fft)
     # amplitudeSpectrum = [ np.sqrt(c.real ** 2 + c.imag ** 2) for c in buf_fft]
-    amplitudeSpectrum = [ np.sqrt(c.real ** 2 + c.imag ** 2)/MAX for c in buf_fft]
+    amplitudeSpectrum = [ np.sqrt(c.real ** 2 + c.imag ** 2)/util.MAX for c in buf_fft]
     ave_var.extend(amplitudeSpectrum)
     # plt.plot(axis_x, amplitudeSpectrum)
     # plt.show()

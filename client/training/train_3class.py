@@ -1,16 +1,14 @@
 # conding: utf-8
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+import sys,os
+sys.path.append(os.path.dirname(os.path.abspath(__file__))+'/..')
+# import pprint
+# pprint.pprint(sys.path)
+
 import sys, os, re, glob, argparse
 import numpy as np
 import tensorflow as tf
-import model_3class as model
 import wave
-import matplotlib
-import matplotlib.pyplot as plt
-from statistics import mean, median,variance,stdev
-from common import *
+from common import model_3class, util
 
 def wave_fft(file_name):
     wave_file = wave.open(file_name, "r")
@@ -18,26 +16,26 @@ def wave_fft(file_name):
     wave_file.close()
     buf_int = np.frombuffer(buf, dtype="int16") / 32768.0
     buf_fft = np.fft.fft(buf_int) 
-    amplitudeSpectrum = [ np.sqrt(c.real ** 2 + c.imag ** 2)/MAX for c in buf_fft]
+    amplitudeSpectrum = [ np.sqrt(c.real ** 2 + c.imag ** 2)/util.MAX for c in buf_fft]
     return amplitudeSpectrum
 
 def read_data(data, fname, label):
     for f in glob.glob(fname):
         spectrum = np.asarray( wave_fft(f) )
-        data.append( Data(spectrum, label) )
+        data.append( util.Data(spectrum, label) )
 
 def create_train_test():
     data_red, data_on, data_off = [], [], []
     print(" Read RED dir")
-    read_data(data_red, RED_DIR+"*.wav", Status.RED)
+    read_data(data_red, util.RED_DIR+"*.wav", util.Status.RED)
     print(" Read ON dir")
-    read_data(data_on, ON_DIR+"*.wav", Status.ON)
+    read_data(data_on, util.ON_DIR+"*.wav", util.Status.ON)
     print(" Read OFF dir")
-    read_data(data_off, OFF_DIR+"*.wav", Status.OFF)
+    read_data(data_off, util.OFF_DIR+"*.wav", util.Status.OFF)
 
-    num_red_train = int(PER_TRAIN * len(data_red))
-    num_on_train = int(PER_TRAIN * len(data_on))
-    num_off_train = int(PER_TRAIN * len(data_off))
+    num_red_train = int(util.PER_TRAIN * len(data_red))
+    num_on_train = int(util.PER_TRAIN * len(data_on))
+    num_off_train = int(util.PER_TRAIN * len(data_off))
 
     data_train = np.concatenate( [data_red[:num_red_train], data_on[:num_on_train], data_off[:num_off_train]] )
     data_test = np.concatenate( [data_red[num_red_train:], data_on[num_on_train:], data_off[num_off_train:]] )
@@ -51,7 +49,7 @@ def create_train_test():
 
 def calc_acc(data):
     total_pred = np.array([])
-    num_batch = NUM_BATCH*2
+    num_batch = util.NUM_BATCH*2
     for i in range(0, len(data), num_batch):
         batch = data[i:i+num_batch]
         batch_input = np.array([i.spectrum for i in batch], dtype=np.float32)
@@ -65,19 +63,19 @@ if __name__=='__main__':
     data_train, data_test = create_train_test()
 
     print("=> init model")
-    model = model.Model((DATA_LEN,OUTPUT_SIZE))
+    model = model_3class.Model((util.DATA_LEN, util.OUTPUT_SIZE))
 
     print("=> Start training")
     acc_train = calc_acc(data_train)
     acc_test = calc_acc(data_test)
     print("acc_train:{:.4f} test:{:.4f}".format(acc_train,acc_test))
 
-    for epoch in range(NUM_EPOCH):
+    for epoch in range(util.NUM_EPOCH):
         print("Epoch : ",epoch)
 
         # update
-        for i in range(0, len(data_train), NUM_BATCH):
-            batch = data_train[ i:i+NUM_BATCH ]
+        for i in range(0, len(data_train), util.NUM_BATCH):
+            batch = data_train[ i:i+util.NUM_BATCH ]
             batch_input = np.array([i.spectrum for i in batch], dtype=np.float32)
             batch_label = np.array([i.label.value for i in batch], dtype=np.float32)
             model.update_model(batch_input,batch_label)
