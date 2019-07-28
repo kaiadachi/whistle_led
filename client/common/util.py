@@ -31,7 +31,7 @@ def get_dir(status):
     else:
         return NONE_DIR
 
-PER_TRAIN = 0.9
+PER_TRAIN = 1.0
 CHUNK, RATE = 1024, 16000
 DATA_LEN = RATE
 OUTPUT_SIZE = len(Status)
