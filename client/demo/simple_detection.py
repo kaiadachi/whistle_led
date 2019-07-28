@@ -38,16 +38,22 @@ def main(queue):
     frame = []
     all_whistle = []
     tmp = [False for k in range(20)]
+    start = int((CHUNK / 2 / 8) * 0.5)
+    end = int((CHUNK / 2 / 8) * 4)
     is_detected = False
     print("口笛の検出をします。検出時間は" + str(RECORD_SECONDS) + "秒間です")
     for i in range(int(RATE / CHUNK * RECORD_SECONDS)):
         data = stream.read(CHUNK)
         # convert data
-        npData = np.frombuffer(data, dtype="int16") / 32768.0
-
-        threshold = 0.06  # CAN BE CHANGED
+        np_data = np.frombuffer(data, dtype="int16") / 32768.0
+        fft = np.fft.fft(np_data)
+        amplitude_spectrum = [np.sqrt(c.real ** 2 + c.imag ** 2) for c in fft]
+        threshold1 = 0.2  # CAN BE CHANGED
+        threshold2 = 0.1  # CAN BE CHANGED
         is_threshold_over = False
-        if max(npData) > threshold:
+        sound_range = amplitude_spectrum[start:end]
+
+        if max(np_data) > threshold1 and np.mean(sound_range) > threshold2:
             is_threshold_over = True
 
         tmp.append(is_threshold_over)
@@ -59,7 +65,7 @@ def main(queue):
 
         # whistle detection
         # CAN BE IMPROVED!!
-        if sum(tmp[7:13]) >= 3 and i >= 16:
+        if 2 <= sum(tmp[7:13]) <= 4 and i >= 16:
             print("口笛検出")
             all_whistle.append(frame[5:15])
             tmp = [False for k in range(0, 20)]
